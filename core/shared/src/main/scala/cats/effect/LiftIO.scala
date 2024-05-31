@@ -18,7 +18,7 @@ package cats.effect
 
 import cats.{~>, Applicative, FlatMap, Functor}
 import cats.data.{ContT, EitherT, IorT, Kleisli, OptionT, ReaderWriterStateT, StateT, WriterT}
-import cats.kernel.Monoid
+import cats.kernel.Semigroup
 
 trait LiftIO[F[_]] {
   def liftIO[A](ioa: IO[A]): F[A]
@@ -87,7 +87,7 @@ object LiftIO {
   implicit def catsWriterTLiftIO[F[_], L](
       implicit F: LiftIO[F],
       FA: Applicative[F],
-      L: Monoid[L]): LiftIO[WriterT[F, L, *]] =
+      L: Semigroup[L]): LiftIO[WriterT[F, L, *]] =
     new LiftIO[WriterT[F, L, *]] {
       override def liftIO[A](ioa: IO[A]): WriterT[F, L, A] =
         WriterT.liftF(F.liftIO(ioa))
@@ -112,7 +112,7 @@ object LiftIO {
   implicit def catsReaderWriterStateTLiftIO[F[_], E, L, S](
       implicit F: LiftIO[F],
       FA: Applicative[F],
-      L: Monoid[L]): LiftIO[ReaderWriterStateT[F, E, L, S, *]] =
+      L: Semigroup[L]): LiftIO[ReaderWriterStateT[F, E, L, S, *]] =
     new LiftIO[ReaderWriterStateT[F, E, L, S, *]] {
       override def liftIO[A](ioa: IO[A]): ReaderWriterStateT[F, E, L, S, A] =
         ReaderWriterStateT.liftF(F.liftIO(ioa))
